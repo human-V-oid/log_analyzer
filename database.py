@@ -20,16 +20,16 @@ def createTable():
     conn.close()
 # --------------------------------------------------------------->>>>>>>>>>>
 
-def createAccount(email, username, password):
+def createAccount(username, password, email):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
     insert_query = '''
-    INSERT INTO userInfo ( email, username, password)
+    INSERT INTO userInfo ( username, password, email)
     VALUES (?, ?, ?, ?)
     '''
     try:
-        cursor.execute(insert_query, (email, username, password))
+        cursor.execute(insert_query, (username, password, email))
         conn.commit()
     except sqlite3.Error as e:
         print("Error:",e)
@@ -72,7 +72,7 @@ def isUserPresent(username, password):
     return True if data else False
 # --------------------------------------------------------------->>>>>>>>>>>
 
-def isCredentialsCorrect(email, username):
+def isCredentialsCorrect(username, email):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
@@ -80,7 +80,7 @@ def isCredentialsCorrect(email, username):
     SELECT * FROM userInfo 
     WHERE username = ? AND email = ?
     '''
-    cursor.execute(credential_query,(email, username))
+    cursor.execute(credential_query,(username, email))
     data = cursor.fetchall()
 
     conn.commit()
@@ -156,34 +156,33 @@ def getData():
 
 def parse_apache_log_line(log_line):
     # Regular expression for common Apache log format
-    log_pattern = re.compile(r'(\S+) (\S+) (\S+) \[([^\]]+)\] "(\S+) (\S+) (\S+)" (\d+) (\S+) "(.*?)" "(.*?)"')
+    log_pattern = re.compile(r'(?P<ip_address>\S+) \S+ \S+ \[.*?\] "(?P<method>\S+) (?P<request>\S+) \S+" (?P<status_code>\d+) \S+ "(?P<user_agent>.*?)"')
 
     # Match the log entry with the regular expression
     match = log_pattern.match(log_line)
     
     if match:
-        groups = match.groups()
-        ip_address, _, _, timestamp_str, method, request, _, status_code, _, user_agent = groups
+        groups = match.groupdict()
+        timestamp_str = log_line.split('[')[1].split(']')[0].strip()  # Extract timestamp separately
 
-        # Convert timestamp to a standardized format
+        # Modify the timestamp format to match the provided log entries
         timestamp = datetime.strptime(timestamp_str, '%d/%b/%Y:%H:%M:%S %z').strftime('%Y-%m-%d %H:%M:%S')
 
         return {
-            'ip_address': ip_address,
+            'ip_address': groups['ip_address'],
             'timestamp': timestamp,
-            'request': f"{method} {request}",
-            'status_code': int(status_code),
-            'user_agent': user_agent
+            'request': f"{groups['method']} {groups['request']}",
+            'status_code': int(groups['status_code']),
+            'user_agent': groups['user_agent']
         }
     else:
         return None
-
 # --------------------------------------------------------------->>>>>>>>>>>
 
 def addData(log_file_path, database_name="database.db"):
-    # if temp == '':
-    #     print("Enter some Data")
-    #     return "Enter some Data"
+    if log_file_path == '':
+        print("Enter some Data")
+        return "Enter some Data"
     # conn = sqlite3.connect("database.db")
     # cursor = conn.cursor()
 
@@ -215,11 +214,11 @@ def addData(log_file_path, database_name="database.db"):
             for log_line in log_file:
                 # Parse each log entry
                 log_data = parse_apache_log_line(log_line)
-                
+                print(log_data)
                 # If the log entry is valid, insert it into the database
                 if log_data:
                     cursor.execute(
-                        'INSERT INTO apache_logs (ip_address, timestamp, request, status_code, user_agent) VALUES (?, ?, ?, ?, ?)',
+                        'INSERT INTO dataset (ip_address, timestamp, request, status_code, user_agent) VALUES (?, ?, ?, ?, ?)',
                         (log_data['ip_address'], log_data['timestamp'], log_data['request'], log_data['status_code'], log_data['user_agent'])
                     )
 
@@ -301,3 +300,5 @@ def clearDataset():
     
     conn.commit()
     conn.close()
+
+print(parse_apache_log_line('127.0.0.1 - - [22/Nov/2023:12:34:56 +0000] "GET /example-page HTTP/1.1" 200 1234 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"'))

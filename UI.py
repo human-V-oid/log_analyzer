@@ -54,12 +54,12 @@ def signUpBtn():
         register_error.configure(text = "Incorrect Captcha Letters!")
         return
 
-    if(username == "" or password == "" or mobile == "" or email == ""):
+    if(username == "" or password == "" or email == ""):
         print("Fill All the entries")
         register_error.configure(text = "Fill All the entries!")
         return 
 
-    createAccount(username, password, mobile, email)
+    createAccount(username, password, email)
 
     welcomeHeading.configure(text=f"Welcome {username}")
 
@@ -154,7 +154,7 @@ root.iconbitmap("asset/icon.ico")
 # LOGIN
 login_frame = CTkFrame(master=root)
 
-heading=CTkLabel(master=login_frame, width=1000, height=100, text="Temperature Predictor ☀️", font=("aerial", 72), text_color="white")
+heading=CTkLabel(master=login_frame, width=1000, height=100, text="Simple Log Analyzer", font=("aerial", 72), text_color="white")
 heading.place(anchor="center", relx=0.5, rely=0.2)
 
 username_entry = CTkEntry(master=login_frame, width=500, height=50, placeholder_text="Username")
@@ -260,10 +260,10 @@ welcomeHeading.place(anchor="center", relx=0.5, rely=0.1)
 # day_entry = CTkEntry(master=home_frame, width=300, height=50, placeholder_text="Enter the Day Number: ", font=("aerial", 20))
 # day_entry.place(rely = 0.2, relx=0.4,anchor="center")
 
-# temp_entry = CTkEntry(master=home_frame, width=300, height=50, placeholder_text="Enter the Temperature: ", font=("aerial", 20))
-# temp_entry.place(rely = 0.2, relx=0.6,anchor="center")
+file_path = CTkEntry(master=home_frame, width=750, height=50, placeholder_text="Enter the path of the Apache log file: ", font=("aerial", 20))
+file_path.place(rely = 0.2, relx=0.5,anchor="center")
 
-add_button = CTkButton(master=home_frame, text="ADD to dataset", height = 50, command=addingData)
+add_button = CTkButton(master=home_frame, text="Parse and add", height = 50, command=addingData)
 add_button.place(rely = 0.3, relx=0.4, anchor="center")
 
 # update_button = CTkButton(master=home_frame, text="UPDATE in dataset", height = 50, command=updatingData)
@@ -281,8 +281,8 @@ add_button.place(rely = 0.3, relx=0.4, anchor="center")
 show_button = CTkButton(master=home_frame, text="SHOW LOGS", command=showData, width = 400, height=50)
 show_button.place(rely = 0.56, relx=0.5, anchor="center")
 
-# outputHeading=CTkLabel(master=home_frame, width=1000, height=100, text="Tomorrow's Temperature: ", font=("aerial", 50), text_color="white")
-# outputHeading.place(anchor="center", relx=0.5, rely=0.7)
+outputHeading=CTkLabel(master=home_frame, width=1000, height=100, text="Structured log", font=("aerial", 50), text_color="white")
+outputHeading.place(anchor="center", relx=0.5, rely=0.7)
 
 #----------------------------INITIALIZING--------------------->>>>>>>>>>>>>
 createTable()
