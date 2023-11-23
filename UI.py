@@ -5,7 +5,7 @@ from customtkinter import *
 from PIL import Image
 from tkinter import messagebox
 from database import *
-from machineLearning import *
+# from machineLearning import *
 
 #--------------------------UTILITY FUNCTIONS------------------------>>>>>>>>
 #LOGIN FUNCTION
