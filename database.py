@@ -26,7 +26,7 @@ def createAccount(username, password, email):
     
     insert_query = '''
     INSERT INTO userInfo ( username, password, email)
-    VALUES (?, ?, ?, ?)
+    VALUES (?, ?, ?)
     '''
     try:
         cursor.execute(insert_query, (username, password, email))
