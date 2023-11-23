@@ -1,4 +1,6 @@
 import sqlite3
+import re
+from datetime import datetime
 
 # --------------------------------------------------------------->>>>>>>>>>>
 def createTable():
@@ -8,10 +10,9 @@ def createTable():
     create_table_query = '''
     CREATE TABLE IF NOT EXISTS userInfo (
         id INTEGER PRIMARY KEY,
+        email TEXT,
         username TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        mobileno TEXT,
-        email TEXT
+        password TEXT NOT NULL
     );
     '''
     cursor.execute(create_table_query)
@@ -19,16 +20,16 @@ def createTable():
     conn.close()
 # --------------------------------------------------------------->>>>>>>>>>>
 
-def createAccount(username, password, mobile, email):
+def createAccount(email, username, password):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
     insert_query = '''
-    INSERT INTO userInfo (username, password, mobileno, email)
+    INSERT INTO userInfo ( email, username, password)
     VALUES (?, ?, ?, ?)
     '''
     try:
-        cursor.execute(insert_query, (username, password, mobile, email))
+        cursor.execute(insert_query, (email, username, password))
         conn.commit()
     except sqlite3.Error as e:
         print("Error:",e)
@@ -71,15 +72,15 @@ def isUserPresent(username, password):
     return True if data else False
 # --------------------------------------------------------------->>>>>>>>>>>
 
-def isCredentialsCorrect(username, mobile, email):
+def isCredentialsCorrect(email, username):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
     credential_query = '''
     SELECT * FROM userInfo 
-    WHERE username = ? AND mobileno = ? AND email = ?
+    WHERE username = ? AND email = ?
     '''
-    cursor.execute(credential_query,(username, mobile, email))
+    cursor.execute(credential_query,(email, username))
     data = cursor.fetchall()
 
     conn.commit()
@@ -126,8 +127,12 @@ def createDataset():
 
     create_table_query = '''
     CREATE TABLE IF NOT EXISTS dataset (
-        id INTEGER PRIMARY KEY,
-        temp INTEGER NOT NULL
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ip_address TEXT,
+        timestamp TEXT,
+        request TEXT,
+        status_code INTEGER,
+        user_agent TEXT        
     );
     '''
     cursor.execute(create_table_query)
@@ -149,90 +154,141 @@ def getData():
     return data
 # --------------------------------------------------------------->>>>>>>>>>>
 
+def parse_apache_log_line(log_line):
+    # Regular expression for common Apache log format
+    log_pattern = re.compile(r'(\S+) (\S+) (\S+) \[([^\]]+)\] "(\S+) (\S+) (\S+)" (\d+) (\S+) "(.*?)" "(.*?)"')
 
-def addData(temp):
-    if temp == '':
-        print("Enter some Data")
-        return "Enter some Data"
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
+    # Match the log entry with the regular expression
+    match = log_pattern.match(log_line)
+    
+    if match:
+        groups = match.groups()
+        ip_address, _, _, timestamp_str, method, request, _, status_code, _, user_agent = groups
 
-    query = '''
-    INSERT INTO dataset (temp)
-    VALUES (?)
-    '''
-    if all(char.isdigit() for char in temp):
-        try:
-            cursor.execute(query,(temp,))
-            conn.commit()
-            conn.close()
-            print("Temperature Recorded")
-            return "Temperature Recorded"
-        except KeyError as e:
-            print(e)
+        # Convert timestamp to a standardized format
+        timestamp = datetime.strptime(timestamp_str, '%d/%b/%Y:%H:%M:%S %z').strftime('%Y-%m-%d %H:%M:%S')
+
+        return {
+            'ip_address': ip_address,
+            'timestamp': timestamp,
+            'request': f"{method} {request}",
+            'status_code': int(status_code),
+            'user_agent': user_agent
+        }
     else:
-        conn.commit()
-        conn.close()
-        print("Give Numeric Values")
-        return "Give Numeric Values"
+        return None
+
 # --------------------------------------------------------------->>>>>>>>>>>
 
-def deleteData(day):
+def addData(log_file_path, database_name="database.db"):
+    # if temp == '':
+    #     print("Enter some Data")
+    #     return "Enter some Data"
+    # conn = sqlite3.connect("database.db")
+    # cursor = conn.cursor()
 
-    if(day == ""):
-        return "Enter the Day Number"
+    # query = '''
+    # INSERT INTO dataset (temp)
+    # VALUES (?)
+    # '''
+    # if all(char.isdigit() for char in temp):
+    #     try:
+    #         cursor.execute(query,(temp,))
+    #         conn.commit()
+    #         conn.close()
+    #         print("Temperature Recorded")
+    #         return "Temperature Recorded"
+    #     except KeyError as e:
+    #         print(e)
+    # else:
+    #     conn.commit()
+    #     conn.close()
+    #     print("Give Numeric Values")
+    #     return "Give Numeric Values"
 
-    conn = sqlite3.connect("database.db")
+    # Connect to the SQLite database
+    conn = sqlite3.connect(database_name)
     cursor = conn.cursor()
 
-    query = '''
-    DELETE FROM dataset 
-    WHERE id = (?)
-    '''
-    if all(char.isdigit() for char in day):
-        try:
-            cursor.execute(query,(day,))
-            conn.commit()
-            conn.close()
-        except:
-            print("Error occured")
-        else:
-            return "Temperature Deleted"
-    else:
+    try:
+        with open(log_file_path, 'r') as log_file:
+            for log_line in log_file:
+                # Parse each log entry
+                log_data = parse_apache_log_line(log_line)
+                
+                # If the log entry is valid, insert it into the database
+                if log_data:
+                    cursor.execute(
+                        'INSERT INTO apache_logs (ip_address, timestamp, request, status_code, user_agent) VALUES (?, ?, ?, ?, ?)',
+                        (log_data['ip_address'], log_data['timestamp'], log_data['request'], log_data['status_code'], log_data['user_agent'])
+                    )
+
+        # Commit the changes and close the connection
         conn.commit()
+        print("Data added successfully.")
+    except Exception as e:
+        print(f"Error adding data: {e}")
+    finally:
         conn.close()
-        print("Enter Numeric Values")
-        return "Enter Numeric Values"
+
+# --------------------------------------------------------------->>>>>>>>>>>
+
+# def deleteData(day):
+
+#     if(day == ""):
+#         return "Enter the Day Number"
+
+#     conn = sqlite3.connect("database.db")
+#     cursor = conn.cursor()
+
+#     query = '''
+#     DELETE FROM dataset 
+#     WHERE id = (?)
+#     '''
+#     if all(char.isdigit() for char in day):
+#         try:
+#             cursor.execute(query,(day,))
+#             conn.commit()
+#             conn.close()
+#         except:
+#             print("Error occured")
+#         else:
+#             return "Temperature Deleted"
+#     else:
+#         conn.commit()
+#         conn.close()
+#         print("Enter Numeric Values")
+#         return "Enter Numeric Values"
 
     
 # --------------------------------------------------------------->>>>>>>>>>>
 
-def updateData(day, temp):
+# def updateData(day, temp):
 
-    if(day == "" or temp == ""):
-        return "Enter Data in both fields"
+#     if(day == "" or temp == ""):
+#         return "Enter Data in both fields"
 
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
+#     conn = sqlite3.connect("database.db")
+#     cursor = conn.cursor()
 
-    query = '''
-    UPDATE dataset 
-    SET temp = (?)
-    WHERE id = (?)
-    '''
-    if all(char.isdigit() for char in day) and all(char.isdigit() for char in temp):
-        try:
-            cursor.execute(query,(temp, day))
-        except:
-            conn.commit()
-            conn.close()
-            print("Error occured")
-            return "Error Occured"
-        else:
-            return "Temperature Updated"
-    else: 
-        print("Enter Numeric Values")
-        return "Enter Numeric Values"
+#     query = '''
+#     UPDATE dataset 
+#     SET temp = (?)
+#     WHERE id = (?)
+#     '''
+#     if all(char.isdigit() for char in day) and all(char.isdigit() for char in temp):
+#         try:
+#             cursor.execute(query,(temp, day))
+#         except:
+#             conn.commit()
+#             conn.close()
+#             print("Error occured")
+#             return "Error Occured"
+#         else:
+#             return "Temperature Updated"
+#     else: 
+#         print("Enter Numeric Values")
+#         return "Enter Numeric Values"
 
     
 # --------------------------------------------------------------->>>>>>>>>>>
