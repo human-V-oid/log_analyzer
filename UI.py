@@ -6,7 +6,7 @@ from customtkinter import *
 from PIL import Image
 from tkinter import messagebox
 from database import *
-# from machineLearning import *
+from plot import *
 
 #--------------------------UTILITY FUNCTIONS------------------------>>>>>>>>
 #LOGIN FUNCTION
@@ -94,27 +94,9 @@ def changeBtn():
     change_frame.pack_forget()
     home_frame.pack(expand=True, fill=tk.BOTH)    
 
-#PREDICT AND UPDATE THE OUTPUT TEXT
-# def predictBtn():
-#     response = predict()
-#     outputHeading.configure(text=f"Tomorrow's temperature for Day{response[0]} is  {response[1]} \u00b0C", font=("Poppins", 40))
-
 #DATASET-------------------------------------------------------->>>>>>>>>>
 def showData():
-    # str = "   Line     IP Address     Timestamp     Request Type     Status Code     User Agent\n\n"
     data = getData()
-    # for record in data:
-    #     str += f"{record[0]} \t {record[1]} \t {record[2]} \t {record[3]} \t {record[4]} \n"
-
-    # outputHeading.configure(text=f"{data}", font=("Poppins", 10))
-
-    # dataWindow = tk.Toplevel(root)
-    # dataLabel=CTkLabel(master=dataWindow, width=1000, height=100, text=str, font=("Poppins", 15), text_color="black")
-    # dataLabel.place(anchor="center", relx=0.5, rely=0.2)
-    # dataLabel.pack()
-
-    # print(data)
-
     window = tk.Tk()
     window.title('Structured Apache Access log')
 
@@ -142,14 +124,6 @@ def showData():
 
 def addingData():
     res = addData(file_path.get())
-
-# def updatingData():
-#     res = updateData(day_entry.get(), temp_entry.get())
-#     outputHeading.configure(text=f"{res}", font=("Poppins", 30))
-
-# def deletingData():
-#     res = deleteData(day_entry.get())
-#     outputHeading.configure(text=f"{res}", font=("Poppins", 30))
 
 #NAVIGATION------------------------------->>>>>>>>>>>>>
 def registerToLogin():
@@ -219,9 +193,6 @@ register_username_entry.place(rely = 0.30, relx=0.3,anchor="center")
 register_password_entry = CTkEntry(master=register_frame, width=300, height=35, font=("Poppins", 22), placeholder_text="Password")
 register_password_entry.place(rely = 0.40, relx=0.3,anchor="center")
 
-# register_mobile_entry = CTkEntry(master=register_frame, width=500, height=50, placeholder_text="Mobile Number")
-# register_mobile_entry.place(rely = 0.35, relx=0.5,anchor="center")
-
 register_email_entry = CTkEntry(master=register_frame, width=300, height=35, font=("Poppins", 22), placeholder_text="Email")
 register_email_entry.place(rely = 0.50, relx=0.3,anchor="center")
 
@@ -255,8 +226,6 @@ registerHeading.place(anchor="center", relx=0.5, rely=0.2)
 forgot_username_entry = CTkEntry(master=forgot_frame, width=300, height=35, font=("Poppins", 22), placeholder_text="Username")
 forgot_username_entry.place(rely = 0.45, relx=0.3,anchor="center")
 
-# forgot_mobile_entry = CTkEntry(master=forgot_frame, width=300, height=35, font=("Poppins", 22), placeholder_text="Mobile")
-# forgot_mobile_entry.place(rely = 0.50, relx=0.3,anchor="center")
 
 forgot_email_entry = CTkEntry(master=forgot_frame, width=300, height=35, font=("Poppins", 22), placeholder_text="Email")
 forgot_email_entry.place(rely = 0.60, relx=0.3,anchor="center")
@@ -308,4 +277,3 @@ createTable()
 createDataset()
 login_frame.pack(expand=True, fill=tk.BOTH)
 root.mainloop()
-clearDataset()

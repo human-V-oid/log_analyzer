@@ -1,8 +1,6 @@
 import sqlite3
 import re
-import matplotlib.pyplot as plt
 from datetime import datetime
-from collections import Counter
 
 # --------------------------------------------------------------->>>>>>>>>>>
 def createTable():
@@ -158,30 +156,6 @@ def getData():
 
 def parse_apache_log_line(log_line):
     # Regular expression for common Apache log format
-    # log_pattern = re.compile(r'(?P<ip_address>\S+) \S+ \S+ \[.*?\] "(?P<method>\S+) (?P<request>\S+) \S+" (?P<status_code>\d+) \S+ "(?P<user_agent>.*?)"')
-
-    # # Match the log entry with the regular expression
-    # match = log_pattern.match(log_line)
-    
-    # if match:
-    #     groups = match.groupdict()
-    #     timestamp_str = log_line.split('[')[1].split(']')[0].strip()  # Extract timestamp separately
-
-    #     # Modify the timestamp format to match the provided log entries
-    #     timestamp = datetime.strptime(timestamp_str, '%d/%b/%Y:%H:%M:%S %z').strftime('%Y-%m-%d %H:%M:%S')
-
-    #     return {
-    #         'ip_address': groups['ip_address'],
-    #         'timestamp': timestamp,
-    #         'request': f"{groups['method']} {groups['request']}",
-    #         'status_code': int(groups['status_code']),
-    #         'user_agent': groups['user_agent']
-    #     }
-    # else:
-    #     return None
-
-    
-    # Regular expression for common Apache log format
     log_pattern = re.compile(r'(?P<ip_address>\S+) \S+ \S+ \[.*?\] "(?P<method>\S+) (?P<request>\S+) \S+" (?P<status_code>\d+) \S+ "(?P<user_agent>.*?)"')
 
     # Match the log entry with the regular expression
@@ -209,29 +183,6 @@ def addData(log_file_path, database_name="database.db"):
     if log_file_path == '':
         print("Enter some Data")
         return "Enter some Data"
-    # conn = sqlite3.connect("database.db")
-    # cursor = conn.cursor()
-
-    # query = '''
-    # INSERT INTO dataset (temp)
-    # VALUES (?)
-    # '''
-    # if all(char.isdigit() for char in temp):
-    #     try:
-    #         cursor.execute(query,(temp,))
-    #         conn.commit()
-    #         conn.close()
-    #         print("Temperature Recorded")
-    #         return "Temperature Recorded"
-    #     except KeyError as e:
-    #         print(e)
-    # else:
-    #     conn.commit()
-    #     conn.close()
-    #     print("Give Numeric Values")
-    #     return "Give Numeric Values"
-
-    # Connect to the SQLite database
     conn = sqlite3.connect(database_name)
     cursor = conn.cursor()
 
@@ -255,68 +206,6 @@ def addData(log_file_path, database_name="database.db"):
     finally:
         conn.close()
 
-# --------------------------------------------------------------->>>>>>>>>>>
-
-# def deleteData(day):
-
-#     if(day == ""):
-#         return "Enter the Day Number"
-
-#     conn = sqlite3.connect("database.db")
-#     cursor = conn.cursor()
-
-#     query = '''
-#     DELETE FROM dataset 
-#     WHERE id = (?)
-#     '''
-#     if all(char.isdigit() for char in day):
-#         try:
-#             cursor.execute(query,(day,))
-#             conn.commit()
-#             conn.close()
-#         except:
-#             print("Error occured")
-#         else:
-#             return "Temperature Deleted"
-#     else:
-#         conn.commit()
-#         conn.close()
-#         print("Enter Numeric Values")
-#         return "Enter Numeric Values"
-
-    
-# --------------------------------------------------------------->>>>>>>>>>>
-
-# def updateData(day, temp):
-
-#     if(day == "" or temp == ""):
-#         return "Enter Data in both fields"
-
-#     conn = sqlite3.connect("database.db")
-#     cursor = conn.cursor()
-
-#     query = '''
-#     UPDATE dataset 
-#     SET temp = (?)
-#     WHERE id = (?)
-#     '''
-#     if all(char.isdigit() for char in day) and all(char.isdigit() for char in temp):
-#         try:
-#             cursor.execute(query,(temp, day))
-#         except:
-#             conn.commit()
-#             conn.close()
-#             print("Error occured")
-#             return "Error Occured"
-#         else:
-#             return "Temperature Updated"
-#     else: 
-#         print("Enter Numeric Values")
-#         return "Enter Numeric Values"
-
-    
-# --------------------------------------------------------------->>>>>>>>>>>
-
 def clearDataset():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
@@ -327,42 +216,3 @@ def clearDataset():
     conn.close()
 
 # --------------------------------------------------------------->>>>>>>>>>>
-
-def plot_requests_by_ip(data = getData()):
-    # Count the number of requests per IP address
-    ip_counter = Counter(entry[1] for entry in data)
-
-    # Plotting
-    plt.figure(figsize=(10, 6))
-    ips, counts = zip(*ip_counter.items())
-    plt.bar(ips, counts, color='blue')
-    plt.xlabel('IP Address')
-    plt.ylabel('Number of Requests')
-    plt.title('Number of Requests by IP Address')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.show()
-
-# --------------------------------------------------------------->>>>>>>>>>>
-
-def plot_requests_over_time(data = getData()):
-    # Extract timestamps and count requests per timestamp
-    timestamps = [entry[2] for entry in data]
-    timestamp_counter = Counter(timestamps)
-
-    # Convert timestamps to datetime objects for sorting
-    sorted_timestamps = sorted(timestamp_counter.keys(), key=lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'))
-
-    # Plotting
-    plt.figure(figsize=(12, 6))
-    counts = [timestamp_counter[timestamp] for timestamp in sorted_timestamps]
-    plt.plot(sorted_timestamps, counts, marker='o', linestyle='-')
-    plt.xlabel('Timestamp')
-    plt.ylabel('Number of Requests')
-    plt.title('Number of Requests Over Time')
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-    plt.show()
-
-# --------------------------------------------------------------->>>>>>>>>>>
-
