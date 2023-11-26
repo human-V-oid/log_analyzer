@@ -9,6 +9,7 @@ from database import *
 from plot import *
 
 #--------------------------UTILITY FUNCTIONS------------------------>>>>>>>>
+
 #LOGIN FUNCTION
 def loginBtn():
     username = username_entry.get()
@@ -44,6 +45,7 @@ def registerBtn():
     login_frame.pack_forget()
     register_frame.pack(expand=True, fill=tk.BOTH)
 
+#SIGNUP BUTTON
 def signUpBtn():
     email = register_email_entry.get()
     username = register_username_entry.get()

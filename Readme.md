@@ -1,6 +1,6 @@
-# **Weather Prediction and Data Management System**
+# **Apache Log Analyzer**
 # Overview
-The Weather Prediction and Data Management System is a simple desktop application built with Python and the Tkinter library. It allows users to perform various tasks related to weather data management, user registration, and weather prediction.
+This is a simple GUI Desktop application built using Python and SQLite3. The Graphical User Interface is designed using the customtkinter Library. The application enables users to enter an Apache server access log file and view the structured log in a tabular form, along with data visualization.
 
 
 
@@ -34,26 +34,25 @@ The Weather Prediction and Data Management System is a simple desktop applicatio
 # Project Structure
 
 - **database.py:** Contains functions for database management, including user registration, data addition, and more.
-- **machineLearning.py:** Implements machine learning for temperature prediction.
+- **plot.py:** Visualizes data using matplotlib.
 - **UI.py** The main script for the GUI application.
 
 # Installation
 - Make sure you have Python 3.x installed on your system.
-- Install required dependencies using: pip install matplotlib scikit-learn customtkinter captcha pillow
-- If you are using IDLE:
--- Copy the project files into the defult python IDLE's locationn
--- Run UI.py
+- Install required dependencies using: 
+    `pip install matplotlib customtkinter captcha`
+- Clone the project using:
+    `git clone https://github.com/human-V-oid/log-analyzer.git`
 
 # Usage
-- Run UI.py to start the application.
-- Log in or create a new account.
-- Manage temperature data, recover a forgotten password, or make predictions.
-- Visualize temperature data on a graph.
+- Change directory to project dir:
+    `cd log-analyzer`
+- Run UI.py to start the application:
+    `python UI.py`
 
 # Developers words
-- The **test.py** file was created for testing the functions of different modules.
-- I would like to share a rough sketch of how I designed the UI for this app.
-![UI](./asset/UI.jpg)
+- This is not the final version of this software, future versions may include modifications or feature updates.
 
-# Contributors
-#### *Priyanshu-Batham*
+# Contribution
+#### Special thanks to *Priyanshu-Batham* for the origin repo.
+- Anyone can contribute to this repository by submitting a pull request.

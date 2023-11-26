@@ -205,6 +205,7 @@ def addData(log_file_path, database_name="database.db"):
         print(f"Error adding data: {e}")
     finally:
         conn.close()
+# --------------------------------------------------------------->>>>>>>>>>>
 
 def clearDataset():
     conn = sqlite3.connect("database.db")
@@ -214,5 +215,4 @@ def clearDataset():
     
     conn.commit()
     conn.close()
-
 # --------------------------------------------------------------->>>>>>>>>>>

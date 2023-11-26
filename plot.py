@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from datetime import datetime
 
-# --------------------------------------------------------------->>>>>>>>>>>
-
+#PLOT REQUESTS BY IP ADDRESS
 def plot_requests_by_ip(data = getData()):
     # Count the number of requests per IP address
     ip_counter = Counter(entry[1] for entry in data)
@@ -20,8 +19,7 @@ def plot_requests_by_ip(data = getData()):
     plt.tight_layout()
     plt.show()
 
-# --------------------------------------------------------------->>>>>>>>>>>
-
+#PLOT REQUESTS OVER TIME
 def plot_requests_over_time(data = getData()):
     # Extract timestamps and count requests per timestamp
     timestamps = [entry[2] for entry in data]
