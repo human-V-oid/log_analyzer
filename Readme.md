@@ -21,11 +21,6 @@ This is a simple GUI Desktop application built using Python and SQLite3. The Gra
 - Users can add, update, and delete temperature data for specific days.
 - Data is stored in a database for analysis and prediction.
 
-### Weather Prediction:
-
-- The system can predict the temperature for the next day based on the available data.
-- Predictions are displayed to the user.
-
 ### Data Visualization:
 
 - Users can view temperature data on a line graph using Matplotlib.
